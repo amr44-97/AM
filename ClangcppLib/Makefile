@@ -4,7 +4,7 @@ CC = g++
 CFLAGS = -Wall -Wextra  -pedantic -O2 -Wunused-result -std=gnu++20
 CFLAGS_ASM = -Wall -Wextra -fverbose-asm -save-temps -pedantic -O2 -std=gnu++20
 
-BINS =  exe test Libstr.so file_handle.so  asm
+BINS =  exe  Libstr.so file_handle.so  asm
 
 all: $(BINS)
 
@@ -26,9 +26,6 @@ file_handle.so: file_handle.cpp file_handle.hpp
 exe: Test.cpp file_handle.o LibStr.o 
 	$(CC) $(CFLAGS) -o $@ $^
 
-test: ./vlunerabilities/test.cpp file_handle.o LibStr.o 
-	$(CC) $(CFLAGS) -o $@ $^
-	mv $@ ./vlunerabilities/
 	
 asm: Test.cpp 
 	$(CC) $(CFLAGS_ASM) -S $^ -o ./gen_assembly/$@-AT.s
@@ -39,4 +36,3 @@ asm: Test.cpp
 clean:
 	rm *.o exe *.so
 	rm ./gen_assembly/*
-	rm ./vlunerabilities/test
