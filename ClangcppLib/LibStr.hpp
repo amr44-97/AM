@@ -16,15 +16,15 @@ String  StringBuild_s(const char *__str, size_t size);
 
 char*   Str_reverse(char *__String);  
 int     Str_find_char(String __str, char element);
-list    Str_split(String strc);
-list    Str_split_delim(char *strc,const char delimeter[]);
+List<char*>   Str_split(String strc);
+List<char*>    Str_split_delim(char *strc,const char delimeter[]);
 String  Str_substr(String s, size_t st_pos, size_t n);
 
 //char* split(String *__str,const char __delim[]);
 // static String copy(string __str); # defined static in the libstr.c
 
-void    Str_cat_list_fn(String *__str ,...);
-#define Str_cat_list(str,...) Str_cat_list_fn(str,__VA_ARGS__,NULL)
+void    Str_cat_List_fn(String *__str ,...);
+#define Str_cat_List(str,...) Str_cat_List_fn(str,__VA_ARGS__,NULL)
 
 //String Str_cat(String __str,const char * __char);
 void    Str_cat(String* __str ,const char * __char); // deal with the string as mutable
@@ -61,7 +61,7 @@ void Println(unsigned int x);
 void Println(size_t x);
 void Println(String x);
 void Println(char x);
-void Println(list x);
+void Println(List<char*> x);
 void Println(Str_list x);
 void Println(const char* x);
 void Println(int* x);

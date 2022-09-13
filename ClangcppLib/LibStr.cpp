@@ -8,6 +8,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fmt/core.h>
+//#include <fmt/os.h>
+//#include <fmt/xchar.h>
+//#include <fmt/format.h>
+//#include <fmt/printf.h>
 
 #define __STRING_STACK_SIZE 20000
 //#define __MIN_LIST__STR_ 800
@@ -264,7 +269,7 @@ __attribute__((always_inline)) inline int Str_find_char(String __str,
 
 // doesn't split the original string
 
-list Str_split(String strc) {
+List<char*> Str_split(String strc) {
 
   if (strc.str == NULL) {
     fprintf(stderr,
@@ -276,7 +281,7 @@ list Str_split(String strc) {
   }
 
   size_t __len = strc.length;
-  list new_list = {.ptr = (char**)malloc((__len) * sizeof(char *)), .length = 0};
+  List<char*> new_list = {.ptr = (char**)malloc((__len) * sizeof(char *)), .length = 0};
   add_strptr_stack(new_list.ptr);
 
   char *old_list = (char*) calloc((__len + 1) , sizeof(char));
@@ -299,11 +304,11 @@ list Str_split(String strc) {
   return new_list;
 }
 
-list Str_split_delim(char *strc, const char delimeter[]) {
+List<char*> Str_split_delim(char *strc, const char delimeter[]) {
 
   int __len = strlen(strc);
   int del = (int)strlen(delimeter);
-  list new_list = {.ptr =(char**) malloc((__len) * sizeof(char *)), .length = 0};
+  List<char*> new_list = {.ptr =(char**) malloc((__len) * sizeof(char *)), .length = 0};
   add_strptr_stack(new_list.ptr);
 
   char *old_list =(char*) malloc((__len + 1) * sizeof(char));
@@ -347,7 +352,7 @@ list Str_split_delim(char *strc, const char delimeter[]) {
 }
 
 //__attribute__((always_inline)) static inline void
-//add_Str_list_stack(String *__str) {
+//add_Str_List_stack(String *__str) {
 //  __STRING_STACK[__stack_pos] = __str->str;
  // __stack_pos++;
 //}
@@ -457,9 +462,9 @@ void Str_cat_m(String *__str, const char *__char) {
 
 
 // variadic function Not For Use 
-// Insted use The Macro Str_cat_list
+// Insted use The Macro Str_cat_List
 
-void Str_cat_list_fn(String *__str, ...) {
+void Str_cat_List_fn(String *__str, ...) {
  
     va_list va;
     va_start(va, __str);
@@ -589,9 +594,11 @@ void Println(size_t x) { printf("%lu\n", x); }
 void Println(String x) {
   printf("%s\n", x.str);
 }
+
 void Println(char x) { printf("%c\n", x); }
-void Println(list x) {
-  putchar('{');
+
+void Println(List<char*> x) {
+    Println("{");
   for (int i = 0; i < (int)x.length; ++i) {
     if (i == (int)(x.length - 1)) {
       printf("\"%s\" ",(char*) x.ptr[i]);
@@ -599,12 +606,13 @@ void Println(list x) {
       printf("\"%s\", ",(char*) x.ptr[i]);
     }
   }
-  puts("}");
+  Println("}");
 }
 
 void Println(const char *x) {
   printf("%s\n", x);
 }
+
 
 void Println(int *x) { printf("%p\n", (void *)x); }
 
@@ -656,7 +664,7 @@ String String::cat_to_new(const char *__str ){
 
 
 
-list String::split(String strc) {
+List<char*> String::split(String strc) {
 
   if (strc.str == NULL) {
     fprintf(stderr,
@@ -668,7 +676,7 @@ list String::split(String strc) {
   }
 
   size_t __len = strc.length;
-  list new_list = {.ptr = (char**)malloc((__len) * sizeof(char *)), .length = 0};
+  List<char*> new_list = {.ptr = (char**)malloc((__len) * sizeof(char *)), .length = 0};
   add_strptr_stack(new_list.ptr);
 
   char *old_list = (char*) calloc((__len + 1) , sizeof(char));
@@ -692,11 +700,11 @@ list String::split(String strc) {
 }
 
 
-list String::split_by_delim(char *strc, const char delimeter[]) {
+List<char*> String::split_by_delim(char *strc, const char delimeter[]) {
 
   int __len = strlen(strc);
   int del = (int)strlen(delimeter);
-  list new_list = {.ptr =(char**) malloc((__len) * sizeof(char *)), .length = 0};
+  List<char*> new_list = {.ptr =(char**) malloc((__len) * sizeof(char *)), .length = 0};
   add_strptr_stack(new_list.ptr);
 
   char *old_list =(char*) malloc((__len + 1) * sizeof(char));
@@ -742,12 +750,12 @@ list String::split_by_delim(char *strc, const char delimeter[]) {
 
 
 
-String String::substr(String s, size_t st_pos, size_t n) {
+String String::substr( size_t st_pos, size_t n) {
   String __strl = {0,0,NULL};
 
-  for (int i = 0; i < (int)s.length; i++) {
+  for (int i = 0; i < (int) this->length; i++) {
     if (i == (int)st_pos) {
-      __strl = StringBuild_s(&s.str[st_pos], n);
+      __strl = StringBuild_s(&this->str[st_pos], n);
     }
   }
   return __strl;
@@ -786,11 +794,13 @@ String String::Build(const char *__str) {
   return __local;
 }
 
-__attribute__((always_inline)) inline int String::find_char(String __str,
+
+__attribute__((always_inline)) inline int String::find_char(
                                                         char element) {
   _pos __curr_pos = 0;
-  for (int i = 0; i < (int)__str.length; i++) {
-    if (__str.str[i] == element) {
+  size_t len = this->length ;//strlen(__str);
+  for (int i = 0; i < (int)len; i++) {
+    if (this->str[i] == element) {
       __curr_pos = i;
       break;
     }
@@ -798,18 +808,20 @@ __attribute__((always_inline)) inline int String::find_char(String __str,
   return (int)__curr_pos;
 }
 
-__attribute__((always_inline)) inline int String::find_char(const char* __str,
-                                                        char element) {
+//__attribute__((always_inline)) inline 
+int String::find_char(size_t cur_index,char element) {
   _pos __curr_pos = 0;
-  size_t len = strlen(__str);
-  for (int i = 0; i < (int)len; i++) {
-    if (__str[i] == element) {
+  size_t len = this->length ;//strlen(__str);
+  for (int i = cur_index; i < (int)len; i++) {
+    if (this->str[i] == element) {
       __curr_pos = i;
       break;
     }
   }
   return (int)__curr_pos;
 }
+
+
 
 
 
